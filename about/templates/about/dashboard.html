@@ -1,0 +1,257 @@
+{% extends "admin/base_site.html" %}
+{% load humanize %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Home</a>
+    &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+{% if config.page_intro %}
+<div style="margin: 20px 0; padding: 20px; background: #e8f4f8; border-left: 4px solid #417690; max-width: 800px;">
+    <div style="margin: 0; line-height: 1.6; font-size: 1.05em;">
+        {{ config.page_intro|safe }}
+    </div>
+</div>
+{% endif %}
+
+{% if config.show_dashboard_description %}
+<div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #5b80b2; max-width: 800px;">
+    <p style="margin: 0 0 10px 0; line-height: 1.6;">
+        This dashboard displays version information for all critical components of your Django application,
+        including the application code, software dependencies, database, cache, and task queue systems.
+    </p>
+    <p style="margin: 0 0 10px 0; line-height: 1.6; color: #666;">
+        <strong>Configuration:</strong> To customize what information is shown, modify the <code>ABOUT_CONFIG</code>
+        dictionary in your <code>settings.py</code> file. You can enable/disable version checks, add custom sections,
+        and configure how deployment information is detected.
+    </p>
+    <p style="margin: 0; line-height: 1.6; color: #666;">
+        If you want to hide this block, set <strong>'show_dashboard_description': False,</strong> in your <code>ABOUT_CONFIG</code> dictionary.
+    </p>
+</div>
+{% endif %}
+
+<!-- Code Information Section -->
+{% if versions.git_commit or versions.deployment_date %}
+<h2>Code Information</h2>
+
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    <ul style="list-style: none; padding-left: 0;">
+        {% if versions.git_commit %}
+        <li>
+            <strong>Version:</strong>
+            <code>{{ versions.git_commit|slice:":7" }}</code>
+            <small style="color: #666;">({{ versions.git_commit }})</small>
+        </li>
+        {% endif %}
+
+        {% if versions.deployment_date %}
+        <li style="margin-top: 10px;">
+            <strong>Deployed:</strong> {{ versions.deployment_date|naturaltime }} ({{ versions.deployment_date|date:"Y-m-d H:i:s T" }})
+        </li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Software Version Information Section -->
+<h2>Software Version Information</h2>
+
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    <ul style="list-style: none; padding-left: 0;">
+
+        {% if versions.django %}
+        <li>
+            <strong>Django Version:</strong> {{ versions.django }}
+            <a href="https://docs.djangoproject.com/en/stable/releases/" target="_blank" style="margin-left: 10px; font-size: 0.9em;">
+                (link to latest version info)
+            </a>
+        </li>
+        {% endif %}
+
+        {% if versions.python %}
+        <li style="margin-top: 10px;">
+            <strong>Python Version:</strong> {{ versions.python }}
+            <a href="https://www.python.org/downloads/" target="_blank" style="margin-left: 10px; font-size: 0.9em;">
+                (link to latest version info)
+            </a>
+        </li>
+        {% endif %}
+
+        {% if versions.database %}
+        <li style="margin-top: 10px;">
+            <strong>PostgreSQL Database Version:</strong> {{ versions.database }}
+            <a href="https://www.postgresql.org/support/versioning/" target="_blank" style="margin-left: 10px; font-size: 0.9em;">
+                (link to latest version info)
+            </a>
+        </li>
+        {% endif %}
+
+        {% if versions.celery %}
+        <li style="margin-top: 10px;">
+            <strong>Celery Version:</strong> {{ versions.celery }}
+            <a href="https://docs.celeryq.dev/en/stable/changelog.html" target="_blank" style="margin-left: 10px; font-size: 0.9em;">
+                (link to latest version info)
+            </a>
+        </li>
+        {% endif %}
+
+        {% if versions.redis %}
+        <li style="margin-top: 10px;">
+            <strong>Redis Version:</strong> {{ versions.redis }}
+            <a href="https://redis.io/downloads/" target="_blank" style="margin-left: 10px; font-size: 0.9em;">
+                (link to latest version info)
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- Cache Statistics Section -->
+{% if cache_stats %}
+<h2>Cache Statistics</h2>
+
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    <ul style="list-style: none; padding-left: 0;">
+        {% if cache_stats.backend %}
+        <li>
+            <strong>Cache Backend:</strong> {{ cache_stats.backend }}
+            {% if cache_stats.backend_note %}
+                <small style="color: #666;">({{ cache_stats.backend_note }})</small>
+            {% endif %}
+        </li>
+        {% endif %}
+
+        {% if cache_stats.total_keys %}
+        <li style="margin-top: 10px;">
+            <strong>Total Cache Keys:</strong> {{ cache_stats.total_keys|intcomma }}
+        </li>
+        {% endif %}
+
+        {% if cache_stats.used_memory %}
+        <li style="margin-top: 10px;">
+            <strong>Used Memory:</strong> {{ cache_stats.used_memory }}
+            {% if cache_stats.max_memory and cache_stats.max_memory != '0B' %}
+                / {{ cache_stats.max_memory }}
+            {% endif %}
+        </li>
+        {% endif %}
+
+        {% if cache_stats.redis_version %}
+        <li style="margin-top: 10px;">
+            <strong>Redis Server Version:</strong> {{ cache_stats.redis_version }}
+        </li>
+        {% endif %}
+
+        {% if cache_stats.connected_clients %}
+        <li style="margin-top: 10px;">
+            <strong>Connected Clients:</strong> {{ cache_stats.connected_clients }}
+        </li>
+        {% endif %}
+
+        {% if cache_stats.uptime_days %}
+        <li style="margin-top: 10px;">
+            <strong>Redis Uptime:</strong> {{ cache_stats.uptime_days }} days
+        </li>
+        {% endif %}
+
+        {% if cache_stats.error %}
+        <li style="margin-top: 10px; color: #a00;">
+            <strong>Error:</strong> {{ cache_stats.error }}
+        </li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Third Party Django Apps Section -->
+{% if versions.third_party_apps %}
+<h2>Third Party Apps</h2>
+
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    <p style="margin: 0 0 15px 0; color: #666; font-size: 0.95em;">
+        These are third-party Django apps installed via <code>INSTALLED_APPS</code> that are used by this app.
+    </p>
+    {% for dist_name, info in versions.third_party_apps.items %}
+    <div style="margin: 15px 0; padding: 15px; background: white; border-left: 3px solid #5b80b2;">
+        <div style="margin-bottom: 8px;">
+            <strong style="font-size: 1.05em;">{{ dist_name }}</strong>
+            <code style="margin-left: 10px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">{{ info.version }}</code>
+            {% if info.homepage %}
+                <a href="{{ info.homepage }}" target="_blank" style="margin-left: 10px; font-size: 0.9em;">[docs]</a>
+            {% endif %}
+        </div>
+        <div style="color: #666; font-size: 0.9em;">
+            Apps: {% for app in info.apps %}<code style="background: #f9f9f9; padding: 1px 4px; margin-right: 5px;">{{ app }}</code>{% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Third Party Integrations Section -->
+{% if versions.integrations %}
+<h2>Third Party Integrations</h2>
+
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    <p style="margin: 0 0 15px 0; color: #666; font-size: 0.95em;">
+        These are Python packages that don't require <code>INSTALLED_APPS</code> registration but may be actively used by your application.
+    </p>
+
+    <!-- Important Integrations -->
+    {% if important_integrations %}
+    <div style="margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; font-size: 1em; color: #333;">Important Integrations</h3>
+        {% for integration in important_integrations %}
+        <div style="margin: 10px 0; padding: 12px; background: white; border-left: 3px solid #79aec8;">
+            <strong style="font-size: 1.05em;">{{ integration.package_name }}</strong>
+            <code style="margin-left: 10px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">{{ integration.version }}</code>
+            {% if integration.homepage %}
+                <a href="{{ integration.homepage }}" target="_blank" style="margin-left: 10px; font-size: 0.9em;">[docs]</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Other Integrations (Collapsible) -->
+    {% if other_integrations %}
+    <div style="margin-top: 20px;">
+        <details style="cursor: pointer;">
+            <summary style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 3px; font-weight: bold;">
+                Other Integrations ({{ other_integrations|length }})
+            </summary>
+            <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #ddd; border-top: none;">
+                {% for integration in other_integrations %}
+                <div style="margin: 8px 0; padding: 8px; border-bottom: 1px solid #f0f0f0;">
+                    <strong style="font-size: 0.95em;">{{ integration.package_name }}</strong>
+                    <code style="margin-left: 10px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">{{ integration.version }}</code>
+                    {% if integration.homepage %}
+                        <a href="{{ integration.homepage }}" target="_blank" style="margin-left: 10px; font-size: 0.85em;">[docs]</a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </details>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Custom Sections -->
+{% for section in custom_sections %}
+<h2>{{ section.title }}</h2>
+<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    {{ section.content|safe }}
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+recursive-include about/templates *.html
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
