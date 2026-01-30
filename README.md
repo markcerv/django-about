@@ -26,27 +26,27 @@ The About dashboard integrates seamlessly with Django's admin interface, providi
 
 
 ### Normal Django Admin View
-![About link at top of Admin Page](screenshots/main-admin-view.png)
+![About link at top of Admin Page](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/main-admin-view.png)
 
 ### Top of About Page
 Shows the ```page_title``` and ```page_intro``` customizable sections in use and default version of ```"show_dashboard_description": True,```. Also shows the **Code Information Section** (shows git commit hash and deployment date) and **Software Version Information** (Displays major software versions with links to documentation)
-![Top of About Page](screenshots/top-of-admin-about-page.png)
+![Top of About Page](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/top-of-admin-about-page.png)
 
 
 ### Third Party Apps
 Django apps grouped by their distribution package:
-![Third Party Apps](screenshots/admin-about-third-party-apps.png)
+![Third Party Apps](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/admin-about-third-party-apps.png)
 
 ### Third Party Integrations
 Important integrations highlighted, with others in a collapsible section:
-![Integrations](screenshots/admin-about-third-party-integrations.png)
+![Integrations](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/admin-about-third-party-integrations.png)
 
 ### Custom Sections (Optional)
 Example custom section showing environment configuration:
-![Custom Section](screenshots/admin-about-custom-section-example.png)
+![Custom Section](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/admin-about-custom-section-example.png)
 
 Example of how settings.py can be edited to show a custom section showing environment info:
-![Custom Sectionin Editor](screenshots/admin-about-settings-customization.png)
+![Custom Section in Editor](https://raw.githubusercontent.com/markcerv/django-about/main/screenshots/admin-about-settings-customization.png)
 
 The interface uses Django admin's native styling for a consistent, professional appearance.
 
