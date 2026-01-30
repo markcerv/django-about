@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-about"
-version = "0.1.0"
-description = "A reusable Django app that displays system version information in the admin interface"
+version = "0.1.1"
+description = "A customizable Django app that displays system version information in the admin interface"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Mark Cervarich", email = "mark@cervarich.com"}
+    {name = "Mark Cervarich", email = "645942+markcerv@users.noreply.github.com"}
 ]
 keywords = ["django", "admin", "system", "version", "information", "monitoring"]
 classifiers = [

@@ -19,11 +19,36 @@ An extensible Django app that displays system version information in the Django 
 
 ## Screenshots
 
-The dashboard displays in your Django admin with:
-- Code version and deployment information
-- Software version information for all components
-- Cache statistics (if Redis is configured)
-- Custom sections (if configured)
+The About dashboard integrates seamlessly with Django's admin interface, providing a clean and organized view of your system information.
+
+
+
+
+
+### Normal Django Admin View
+![About link at top of Admin Page](screenshots/main-admin-view.png)
+
+### Top of About Page
+Shows the ```page_title``` and ```page_intro``` customizable sections in use and default version of ```"show_dashboard_description": True,```. Also shows the **Code Information Section** (shows git commit hash and deployment date) and **Software Version Information** (Displays major software versions with links to documentation)
+![Top of About Page](screenshots/top-of-admin-about-page.png)
+
+
+### Third Party Apps
+Django apps grouped by their distribution package:
+![Third Party Apps](screenshots/admin-about-third-party-apps.png)
+
+### Third Party Integrations
+Important integrations highlighted, with others in a collapsible section:
+![Integrations](screenshots/admin-about-third-party-integrations.png)
+
+### Custom Sections (Optional)
+Example custom section showing environment configuration:
+![Custom Section](screenshots/admin-about-custom-section-example.png)
+
+Example of how settings.py can be edited to show a custom section showing environment info:
+![Custom Sectionin Editor](screenshots/admin-about-settings-customization.png)
+
+The interface uses Django admin's native styling for a consistent, professional appearance.
 
 ## Installation
 

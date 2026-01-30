@@ -43,8 +43,8 @@ class SystemInformation(Group):
 
     class Meta:
         proxy = True
-        verbose_name = "About"
-        verbose_name_plural = "About"
+        verbose_name = "About / version info"
+        verbose_name_plural = "About / version info"
         app_label = "about"
 
 
