@@ -3,6 +3,60 @@
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
+{% block extrastyle %}
+<style>
+    /* About page common styles */
+    .about-section {
+        margin: 20px 0;
+        padding: 25px;
+        border: 1px solid #ddd;
+        background: #f5f5f5;
+        max-width: 800px;
+    }
+
+    .about-section ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .about-section li {
+        margin-top: 10px;
+    }
+
+    .about-section li:first-child {
+        margin-top: 0;
+    }
+
+    .about-intro {
+        margin: 20px 0;
+        padding: 25px;
+        background: #e8f4f8;
+        border-left: 4px solid #417690;
+        max-width: 800px;
+    }
+
+    .about-description {
+        margin: 20px 0;
+        padding: 25px;
+        background: #f9f9f9;
+        border-left: 4px solid #5b80b2;
+        max-width: 800px;
+    }
+
+    .section-id-badge {
+        display: inline-block;
+        margin-left: 10px;
+        padding: 2px 8px;
+        background: #e0e0e0;
+        color: #666;
+        font-size: 0.75em;
+        font-weight: normal;
+        border-radius: 3px;
+        font-family: monospace;
+    }
+</style>
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">Home</a>
@@ -13,16 +67,20 @@
 {% block content %}
 <div id="content-main">
 
-{% if config.page_intro %}
-<div style="margin: 20px 0; padding: 20px; background: #e8f4f8; border-left: 4px solid #417690; max-width: 800px;">
+{% for section_id in section_order %}
+    {% if section_id == 'page_intro' and config.page_intro %}
+<!-- Page Intro -->
+<div class="about-intro">
+    {% if config.show_section_ids %}<div style="margin-bottom: 10px;"><span class="section-id-badge">[page_intro]</span></div>{% endif %}
     <div style="margin: 0; line-height: 1.6; font-size: 1.05em;">
         {{ config.page_intro|safe }}
     </div>
 </div>
-{% endif %}
 
-{% if config.show_dashboard_description %}
-<div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #5b80b2; max-width: 800px;">
+    {% elif section_id == 'dashboard_description' and config.show_dashboard_description %}
+<!-- Dashboard Description -->
+<div class="about-description">
+    {% if config.show_section_ids %}<div style="margin-bottom: 10px;"><span class="section-id-badge">[dashboard_description]</span></div>{% endif %}
     <p style="margin: 0 0 10px 0; line-height: 1.6;">
         This dashboard displays version information for all critical components of your Django application,
         including the application code, software dependencies, database, cache, and task queue systems.
@@ -36,14 +94,13 @@
         If you want to hide this block, set <strong>'show_dashboard_description': False,</strong> in your <code>ABOUT_CONFIG</code> dictionary.
     </p>
 </div>
-{% endif %}
 
+    {% elif section_id == 'code_info' %}
+        {% if versions.git_commit or versions.deployment_date %}
 <!-- Code Information Section -->
-{% if versions.git_commit or versions.deployment_date %}
-<h2>Code Information</h2>
-
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
-    <ul style="list-style: none; padding-left: 0;">
+<h2>Code Information{% if config.show_section_ids %}<span class="section-id-badge">[code_info]</span>{% endif %}</h2>
+<div class="about-section">
+    <ul>
         {% if versions.git_commit %}
         <li>
             <strong>Version:</strong>
@@ -59,13 +116,13 @@
         {% endif %}
     </ul>
 </div>
-{% endif %}
+        {% endif %}
 
+    {% elif section_id == 'software_versions' %}
 <!-- Software Version Information Section -->
-<h2>Software Version Information</h2>
-
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
-    <ul style="list-style: none; padding-left: 0;">
+<h2>Software Version Information{% if config.show_section_ids %}<span class="section-id-badge">[software_versions]</span>{% endif %}</h2>
+<div class="about-section">
+    <ul>
 
         {% if versions.django %}
         <li>
@@ -114,12 +171,11 @@
     </ul>
 </div>
 
+    {% elif section_id == 'cache_stats' and cache_stats %}
 <!-- Cache Statistics Section -->
-{% if cache_stats %}
-<h2>Cache Statistics</h2>
-
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
-    <ul style="list-style: none; padding-left: 0;">
+<h2>Cache Statistics{% if config.show_section_ids %}<span class="section-id-badge">[cache_stats]</span>{% endif %}</h2>
+<div class="about-section">
+    <ul>
         {% if cache_stats.backend %}
         <li>
             <strong>Cache Backend:</strong> {{ cache_stats.backend }}
@@ -169,13 +225,11 @@
         {% endif %}
     </ul>
 </div>
-{% endif %}
 
+    {% elif section_id == 'third_party_apps' and versions.third_party_apps %}
 <!-- Third Party Django Apps Section -->
-{% if versions.third_party_apps %}
-<h2>Third Party Apps</h2>
-
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+<h2>Third Party Apps{% if config.show_section_ids %}<span class="section-id-badge">[third_party_apps]</span>{% endif %}</h2>
+<div class="about-section">
     <p style="margin: 0 0 15px 0; color: #666; font-size: 0.95em;">
         These are third-party Django apps installed via <code>INSTALLED_APPS</code> that are used by this app.
     </p>
@@ -194,13 +248,11 @@
     </div>
     {% endfor %}
 </div>
-{% endif %}
 
+    {% elif section_id == 'third_party_integrations' and versions.integrations %}
 <!-- Third Party Integrations Section -->
-{% if versions.integrations %}
-<h2>Third Party Integrations</h2>
-
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+<h2>Third Party Integrations{% if config.show_section_ids %}<span class="section-id-badge">[third_party_integrations]</span>{% endif %}</h2>
+<div class="about-section">
     <p style="margin: 0 0 15px 0; color: #666; font-size: 0.95em;">
         These are Python packages that don't require <code>INSTALLED_APPS</code> registration but may be actively used by your application.
     </p>
@@ -221,36 +273,100 @@
     </div>
     {% endif %}
 
-    <!-- Other Integrations (Collapsible) -->
-    {% if other_integrations %}
+    <!-- Other Integrations (Lazy-loaded) -->
+    {% if other_integrations_count > 0 %}
     <div style="margin-top: 20px;">
-        <details style="cursor: pointer;">
+        <details style="cursor: pointer;" id="other-integrations-details">
             <summary style="padding: 10px; background: white; border: 1px solid #ddd; border-radius: 3px; font-weight: bold;">
-                Other Integrations ({{ other_integrations|length }})
+                Other Integrations ({{ other_integrations_count }})
             </summary>
-            <div style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #ddd; border-top: none;">
-                {% for integration in other_integrations %}
-                <div style="margin: 8px 0; padding: 8px; border-bottom: 1px solid #f0f0f0;">
-                    <strong style="font-size: 0.95em;">{{ integration.package_name }}</strong>
-                    <code style="margin-left: 10px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">{{ integration.version }}</code>
-                    {% if integration.homepage %}
-                        <a href="{{ integration.homepage }}" target="_blank" style="margin-left: 10px; font-size: 0.85em;">[docs]</a>
-                    {% endif %}
-                </div>
-                {% endfor %}
+            <div id="other-integrations-container" style="margin-top: 10px; padding: 10px; background: white; border: 1px solid #ddd; border-top: none;">
+                <button
+                    id="scan-integrations-btn"
+                    style="padding: 10px 20px; background: #417690; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 0.95em;"
+                    onclick="loadOtherIntegrations()">
+                    Click to scan {{ other_integrations_count }} integrations
+                </button>
+                <div id="integrations-list" style="margin-top: 10px;"></div>
             </div>
         </details>
     </div>
+
+    <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function loadOtherIntegrations() {
+        const btn = document.getElementById('scan-integrations-btn');
+        const list = document.getElementById('integrations-list');
+
+        // Show loading state
+        btn.textContent = 'Scanning...';
+        btn.disabled = true;
+
+        // Get CSRF token from cookie
+        const csrftoken = getCookie('csrftoken');
+
+        // Fetch integrations
+        fetch('{% url "about:scan_integrations" %}', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide button
+            btn.style.display = 'none';
+
+            // Render integrations
+            if (data.integrations && data.integrations.length > 0) {
+                list.innerHTML = data.integrations.map(integration => `
+                    <div style="margin: 8px 0; padding: 8px; border-bottom: 1px solid #f0f0f0;">
+                        <strong style="font-size: 0.95em;">${integration.package_name}</strong>
+                        <code style="margin-left: 10px; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.85em;">${integration.version}</code>
+                        ${integration.homepage ? `<a href="${integration.homepage}" target="_blank" style="margin-left: 10px; font-size: 0.85em;">[docs]</a>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="color: #666; font-style: italic;">No other integrations found.</p>';
+            }
+        })
+        .catch(error => {
+            btn.textContent = 'Error loading integrations. Click to retry.';
+            btn.disabled = false;
+            console.error('Error loading integrations:', error);
+        });
+    }
+    </script>
     {% endif %}
 </div>
-{% endif %}
 
-<!-- Custom Sections -->
-{% for section in custom_sections %}
-<h2>{{ section.title }}</h2>
-<div style="margin: 20px 0; padding: 25px; border: 1px solid #ddd; background: #f5f5f5; max-width: 800px;">
+    {% else %}
+        {# Custom section - find matching section and render it #}
+        {% for section in custom_sections %}
+            {% if section.id == section_id %}
+<!-- Custom Section: {{ section.title }} -->
+<h2>{{ section.title }}{% if config.show_section_ids %}<span class="section-id-badge">[{{ section.id }}]</span>{% endif %}</h2>
+<div class="about-section">
     {{ section.content|safe }}
 </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endfor %}
 
 </div>

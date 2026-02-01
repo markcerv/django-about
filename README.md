@@ -13,9 +13,10 @@ An extensible Django app that displays system version information in the Django 
 - 📦 **Third Party Apps**: Automatically detects and displays Django apps and Python integrations
 - 📈 **Cache Statistics**: View Redis cache statistics (read-only, no clearing)
 - 🎨 **Clean Admin Integration**: Seamlessly integrates with Django's admin interface
-- ⚙️ **Highly Configurable**: Customize what information is shown
+- ⚙️ **Highly Configurable**: Customize what information is shown and section display order
 - 🔌 **Optional Dependencies**: Gracefully handles missing Celery or Redis
 - 🛠️ **Extensible**: Add custom information sections
+- ⚡ **Performance Optimized**: Lazy-loading for large package lists keeps initial page load fast
 
 ## Screenshots
 
@@ -146,6 +147,12 @@ ABOUT_CONFIG = {
 
     # Custom sections (list of callables)
     'custom_sections': [],
+
+    # Control the order of sections (optional)
+    'section_order': None,  # Use None for default order
+
+    # Show section IDs as badges (helpful for configuring section_order)
+    'show_section_ids': False,  # Set to True to display section IDs next to titles
 }
 ```
 
@@ -222,6 +229,55 @@ ABOUT_CONFIG = {
 - Display application-specific metrics
 - Show active background jobs or scheduled tasks
 - List custom middleware or installed plugins
+
+### Controlling Section Order
+
+By default, sections appear in a standard order. You can customize the order by specifying `section_order` in your config:
+
+```python
+ABOUT_CONFIG = {
+    'page_intro': 'Welcome to our application!',
+    'custom_sections': [environment_info, external_services],
+    'section_order': [
+        'page_intro',              # Show intro first
+        'software_versions',        # Then software versions
+        'environment_info',         # Custom section (by function name)
+        'cache_stats',             # Then cache stats
+        'external_services',        # Another custom section
+        'third_party_apps',        # Django apps
+        'third_party_integrations', # Other integrations
+    ],
+    'show_section_ids': False,  # Set to True to display section IDs next to titles
+}
+```
+
+**Available section IDs:**
+- `page_intro` - Your custom intro message
+- `dashboard_description` - Default description block
+- `code_info` - Git commit and deployment info
+- `software_versions` - Django, Python, database, etc.
+- `cache_stats` - Cache statistics
+- `third_party_apps` - Django apps from INSTALLED_APPS
+- `third_party_integrations` - Other Python packages
+- Custom sections: Use the **function name** (e.g., `environment_info` for a function named `environment_info`), or specify with `'id'` key in the returned dict
+
+**Important:** Sections not listed in `section_order` will still appear if enabled - they'll just be added at the end in default order. This "forgiving" behavior ensures you don't accidentally hide important information.
+
+### Discovering Section IDs
+
+To help you configure `section_order` without reading source code, you can enable section ID display:
+
+```python
+ABOUT_CONFIG = {
+    'show_section_ids': True,
+}
+```
+
+When enabled, each section title will show its ID as a small gray badge, like:
+
+**Code Information [code_info]**
+
+This makes it easy to see which section IDs you can use in your `section_order` configuration. The feature is disabled by default to keep the interface clean in production.
 
 ## Git Integration
 
@@ -306,8 +362,16 @@ Example: `django-allauth` would show with all its apps: `allauth`, `account`, `s
 ### Integrations
 Shows Python packages that don't require `INSTALLED_APPS` registration but may be actively used by your application (like `sentry-sdk`, `redis`, `requests`, etc.), separated into:
 
-- **Important Integrations**: Packages you specify in `important_integrations` config (e.g., Sentry, monitoring tools)
-- **Other Integrations**: All other installed packages, collapsed by default in an accordion
+- **Important Integrations**: Packages you specify in `important_integrations` config (e.g., Sentry, monitoring tools) - always loaded on page load
+- **Other Integrations**: All other installed packages, collapsed by default in an accordion with lazy-loading
+
+#### Performance: Lazy Loading
+
+For performance, "Other Integrations" are **not scanned on initial page load**. Instead, users see a button to "Click to scan X integrations" when they expand that section. This keeps page load times fast (typically under 100ms) even in projects with 100+ installed packages.
+
+When the button is clicked, the integrations are scanned via AJAX and displayed dynamically. This approach provides the best of both worlds:
+- Fast initial page load for most users
+- Full package information available on-demand for those who need it
 
 #### Customizing Important Integrations
 

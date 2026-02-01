@@ -36,6 +36,8 @@ DEFAULT_CONFIG = {
         "flower",
     },
     "custom_sections": [],  # For future extensibility
+    "section_order": None,  # Optional list to control section display order
+    "show_section_ids": False,  # Show section IDs as badges for configuration reference
 }
 
 
